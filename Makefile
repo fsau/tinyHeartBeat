@@ -67,16 +67,6 @@ prog_efuse: ./build/$(PGR)_fuses.bin
 prog_verify: ./build/$(PGR)_fuses.bin ./build/$(PGR).hex
 	avrdude -c $(PGR_HW) -p $(MCU_TARGET) -U flash:v:'build/$(PGR).hex':a -U eeprom:v:'build/$(PGR)_eeprom.hex':a -U hfuse:v:0x$(HFUSE):m -U lfuse:v:0x$(LFUSE):m
 
-export: build/ build/$(PGR).hex build/$(PGR)_eeprom.hex ./build/$(PGR)_fuses.bin
-	mkdir -p ./hex-out/
-	cp ./build/$(PGR).hex ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).hex
-	cp ./build/$(PGR)_eeprom.hex ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT)_eeprom.hex
-	./makebat.sh "$(PGR_HW)" $(MCU_TARGET) $(MCU_TARGET)-$(TAG_COMMIT) $(HFUSE) $(LFUSE) $(EFUSE) > ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).bat
-	unix2dos ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).bat
-	rm -f "./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).zip"
-	7z a ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).zip ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).bat ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).hex ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT)_eeprom.hex
-	rm ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).bat ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT).hex ./hex-out/$(MCU_TARGET)-$(TAG_COMMIT)_eeprom.hex
-
 clean:
 	rm -r ./build/
 	# find . -maxdepth 2 -regextype awk -regex ".*\.(lst|hex|o|d|map|elf|tar.gz|zip|bin)" -delete

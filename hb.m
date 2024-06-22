@@ -30,12 +30,15 @@ for i=0:((7*timePeriod)/400)
     s3 = [s3 t];
 end
 
-s1=[s1,s1,s1];
-s2=[s2,s2,s2];
-s3=[s3,s3,s3];
+% s1=[s1,s1,s1];
+% s2=[s2,s2,s2];
+% s3=[s3,s3,s3];
+p1 = 1/60*round(s1)/2^12;
+p2 = 1/60*round(s2)/2^12;
+p3 = 1/60*round(s3)/2^12;
 
 hold off
-plot(1/60*round(s1)/2^12,'marker','+')
+plot(p1,'marker','+')
 hold on
-plot(1/60*round(s2)/2^12,'marker','*')
-plot(1/60*round(s3)/2^12,'marker','o')
+plot(p2,'marker','*')
+plot(p3,'marker','o')
