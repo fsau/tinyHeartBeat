@@ -2,10 +2,10 @@
 
 ## Description
 
-Tiny servo controller for HeartBeat project using a ATtiny13A microcontroller.
+Tiny servo controller for HeartBeat project using a ATtiny13A 8-pin microcontroller.
 
-It reads the analog value of pin B3 for beat frequency adjustment. Outputs pulsed 
-signals for controlling 3 independent hobby servomotors.
+It reads the analog value of pin B3 for hear rate adjustment. Outputs pulsed 
+signals for controlling 3 hobby servos on pins B0, B1 and B2.
 
 ## Building
 

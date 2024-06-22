@@ -46,6 +46,7 @@ void send_pulse(uint8_t a, uint8_t b, uint8_t c)
     S_PORT &= ~(_BV(S1_N) | _BV(S2_N) | _BV(S3_N)); // clear every pin just in case
 }
 
+// sine lookup table/function
 uint8_t const sin_lut[] PROGMEM = {0, 6, 12, 18, 25, 31, 37, 43, 
                                    49, 56, 62, 68, 74, 80, 86, 92, 
                                    97, 103, 109, 115, 120, 126, 131, 136, 
@@ -56,7 +57,7 @@ uint8_t const sin_lut[] PROGMEM = {0, 6, 12, 18, 25, 31, 37, 43,
                                    251, 252, 253, 254, 254, 255, 255, 255};
 uint8_t mysin(uint8_t s)
 {
-    uint8_t i = s/(256/(sizeof(sin_lut)/sizeof(sin_lut[0])));
+    uint8_t i = s/(256/(sizeof(sin_lut)/sizeof(sin_lut[0]))); // map 0-255 to 0-pi/2
     return pgm_read_byte(&sin_lut[i]);
 }
 
@@ -74,31 +75,31 @@ int main(void)
     ADMUX = _BV(ADLAR) | _BV(MUX1) | _BV(MUX0); // ref=vcc, left adj, pin PB3
     // enable, start, free running, minimum frequency:
     ADCSRA = _BV(ADEN) | _BV(ADSC) | _BV(ADATE) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0);
-    
+
     _delay_ms(10);
 
     // main loop
-    uint8_t s1 = 0, s2 = 0, s3 = 0, speed=ADCH;
+    uint8_t s1=0, s2=0, s3=0, t1=0, t2=0, t3=0;
     sei();
-    for (uint8_t i = 0;; i++)
+    for (uint8_t i = 0xFF;; i++)
     {
         // send pulses
-        send_pulse(s1, s2, s3);
+        if(s1 != 0) send_pulse(s1, s2, s3);
 
         // calculate next pulse widths
-        if (i < (22+speed)/2)
+        if (i < t1)
         {
-            uint8_t t = mysin(i);
-            s1 = t;
+            uint8_t t = mysin(256l*i/t1);
+            s1 = 112-t/4;
             s2 = s1;
-            s3 = 3;
+            s3 = 63+t/8;
         }
-        else if (i < (24+speed+speed/9)/2)
+        else if (i < t2)
         {
             s1 = 112;
             s3 = 64;
         }
-        else if (i < (29+speed+speed/3)/2)
+        else if (i < t3)
         {
             s2 = 112;
             s3 = 64;
@@ -106,7 +107,10 @@ int main(void)
         else
         {
             i = 0;
-            speed = ADC_VAL/2;
+            uint8_t speed = ADC_VAL/2; // 0 to 127
+            t1 = (22+speed)/2;
+            t2 = t1 + (2 + speed/9)/2;
+            t3 = t2 + (5 + speed/3)/2;
         }
 
         // wait for next cycle (1/(~53Hz) = 18.8ms = 11 cycles)
