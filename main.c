@@ -47,17 +47,17 @@ void send_pulse(uint8_t a, uint8_t b, uint8_t c)
 }
 
 // sine lookup table/function
-uint8_t const sin_lut[] PROGMEM = {0, 6, 12, 18, 25, 31, 37, 43, 
-                                   49, 56, 62, 68, 74, 80, 86, 92, 
-                                   97, 103, 109, 115, 120, 126, 131, 136, 
-                                   142, 147, 152, 157, 162, 167, 171, 176, 
-                                   181, 185, 189, 193, 197, 201, 205, 209, 
-                                   212, 216, 219, 222, 225, 228, 231, 234, 
-                                   236, 238, 241, 243, 244, 246, 248, 249, 
+uint8_t const sin_lut[] PROGMEM = {0, 6, 12, 18, 25, 31, 37, 43,
+                                   49, 56, 62, 68, 74, 80, 86, 92,
+                                   97, 103, 109, 115, 120, 126, 131, 136,
+                                   142, 147, 152, 157, 162, 167, 171, 176,
+                                   181, 185, 189, 193, 197, 201, 205, 209,
+                                   212, 216, 219, 222, 225, 228, 231, 234,
+                                   236, 238, 241, 243, 244, 246, 248, 249,
                                    251, 252, 253, 254, 254, 255, 255, 255};
 uint8_t mysin(uint8_t x)
 {
-    uint8_t i = x/(256l/(sizeof(sin_lut)/sizeof(sin_lut[0]))); // 0-255 to 0-pi/2
+    uint8_t i = x / (256l / (sizeof(sin_lut) / sizeof(sin_lut[0]))); // 0-255 to 0-pi/2
     return pgm_read_byte(&sin_lut[i]);
 }
 
@@ -83,20 +83,21 @@ int main(void)
     _delay_ms(10);
 
     // main loop
-    uint8_t s1=0, s2=0, s3=0, t1=0, t2=0, t3=0;
+    uint8_t s1 = 0, s2 = 0, s3 = 0, t1 = 0, t2 = 0, t3 = 0;
     sei();
     for (uint8_t i = 0xFF;; i++)
     {
         // send pulses
-        if(s1 != 0) send_pulse(s1, s2, s3);
+        if (s1 != 0)
+            send_pulse(s1, s2, s3);
 
         // calculate next pulse widths
         if (i < t1)
         {
-            uint8_t t = mysin(256l*i/t1);
-            s1 = 112-t/4;
+            uint8_t t = mysin(256l * i / t1);
+            s1 = 112 - t / 4;
             s2 = s1;
-            s3 = 63+t/8;
+            s3 = 63 + t / 8;
         }
         else if (i < t2)
         {
@@ -111,10 +112,10 @@ int main(void)
         else
         {
             i = 0;
-            uint8_t speed = ADC_VAL/2; // 0 to 127
-            t1 = 25+speed;
-            t2 = t1 + 5 + speed/9;
-            t3 = t2 + 8 + speed/3;
+            uint8_t speed = ADC_VAL / 2; // 0 to 127
+            t1 = 25 + speed;
+            t2 = t1 + 5 + speed / 9;
+            t3 = t2 + 8 + speed / 3;
         }
 
         // wait for next pulse
