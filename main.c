@@ -95,19 +95,19 @@ int main(void)
         if (i < t1)
         {
             uint8_t t = mysin(256l * i / t1);
-            s1 = 112 - t / 4;
+            s1 = 224 - t / 2;
             s2 = s1;
-            s3 = 63 + t / 8;
+            s3 = 126 + t / 4;
         }
         else if (i < t2)
         {
-            s1 = 112;
-            s3 = 64;
+            s1 = 224;
+            s3 = 126;
         }
         else if (i < t3)
         {
-            s2 = 112;
-            s3 = 64;
+            s2 = 224;
+            s3 = 126;
         }
         else
         {
