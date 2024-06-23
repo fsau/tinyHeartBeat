@@ -7,7 +7,7 @@
 #include <util/delay.h>
 
 FUSES = {
-    .low = (LFUSE_DEFAULT),
+    .low = (FUSE_SPIEN & FUSE_SUT0 & FUSE_CKSEL0),
     .high = (HFUSE_DEFAULT),
 };
 
@@ -55,9 +55,9 @@ uint8_t const sin_lut[] PROGMEM = {0, 6, 12, 18, 25, 31, 37, 43,
                                    212, 216, 219, 222, 225, 228, 231, 234, 
                                    236, 238, 241, 243, 244, 246, 248, 249, 
                                    251, 252, 253, 254, 254, 255, 255, 255};
-uint8_t mysin(uint8_t s)
+uint8_t mysin(uint8_t x)
 {
-    uint8_t i = s/(256/(sizeof(sin_lut)/sizeof(sin_lut[0]))); // map 0-255 to 0-pi/2
+    uint8_t i = x/(256/(sizeof(sin_lut)/sizeof(sin_lut[0]))); // 0-255 to 0-pi/2
     return pgm_read_byte(&sin_lut[i]);
 }
 
@@ -108,13 +108,13 @@ int main(void)
         {
             i = 0;
             uint8_t speed = ADC_VAL/2; // 0 to 127
-            t1 = (22+speed)/2;
-            t2 = t1 + (2 + speed/9)/2;
-            t3 = t2 + (5 + speed/3)/2;
+            t1 = (25+speed)/2;
+            t2 = t1 + (5 + speed/9)/2;
+            t3 = t2 + (8 + speed/3)/2;
         }
 
         // wait for next cycle (1/(~53Hz) = 18.8ms = 11 cycles)
-        while (g_counter <= 11)
+        while (g_counter <= 9)
             _NOP();
     }
 
