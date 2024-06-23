@@ -3,7 +3,7 @@
 #include <avr/cpufunc.h>
 #include <avr/pgmspace.h>
 
-#define F_CPU 9600000UL
+#define F_CPU 2400000UL
 #include <util/delay.h>
 
 FUSES = {
@@ -57,19 +57,23 @@ uint8_t const sin_lut[] PROGMEM = {0, 6, 12, 18, 25, 31, 37, 43,
                                    251, 252, 253, 254, 254, 255, 255, 255};
 uint8_t mysin(uint8_t x)
 {
-    uint8_t i = x/(256/(sizeof(sin_lut)/sizeof(sin_lut[0]))); // 0-255 to 0-pi/2
+    uint8_t i = x/(256l/(sizeof(sin_lut)/sizeof(sin_lut[0]))); // 0-255 to 0-pi/2
     return pgm_read_byte(&sin_lut[i]);
 }
 
 int main(void)
 {
+    // setup system clock prescaler
+    CLKPR = _BV(CLKPCE);
+    CLKPR = _BV(CLKPS1); // div by 4 = 2.4Mhz
+
     // setup pins
     S_DDR |= _BV(S1_N) | _BV(S2_N) | _BV(S3_N);     // set as outputs
     S_PORT &= ~(_BV(S1_N) | _BV(S2_N) | _BV(S3_N)); // clear pins
 
     // setup timer
-    TCCR0B = _BV(CS01) | _BV(CS00); // div by 64: resolution 6.7us, overflow 1.71ms
-    TIMSK0 = _BV(TOIE0);            // enable interrupt
+    TCCR0B = _BV(CS01);  // div by 8
+    TIMSK0 = _BV(TOIE0); // enable interrupt
 
     // setup adc
     ADMUX = _BV(ADLAR) | _BV(MUX1) | _BV(MUX0); // ref=vcc, left adj, pin PB3
@@ -108,12 +112,12 @@ int main(void)
         {
             i = 0;
             uint8_t speed = ADC_VAL/2; // 0 to 127
-            t1 = (25+speed)/2;
-            t2 = t1 + (5 + speed/9)/2;
-            t3 = t2 + (8 + speed/3)/2;
+            t1 = 25+speed;
+            t2 = t1 + 5 + speed/9;
+            t3 = t2 + 8 + speed/3;
         }
 
-        // wait for next cycle (1/(~53Hz) = 18.8ms = 11 cycles)
+        // wait for next pulse
         while (g_counter <= 9)
             _NOP();
     }
