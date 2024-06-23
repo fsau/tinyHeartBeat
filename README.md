@@ -9,4 +9,4 @@ signals for controlling 3 hobby servos on pins B0, B1 and B2.
 
 ## Building
 
-With the avr toolchain insatalled, just run `make` and it should generate the `.hex` file. Run `make prog` for programming the chip after building automatically.
+With the avr toolchain installed, just run `make` and it should generate the `.hex` file. Run `make prog` for programming the chip after building automatically.
