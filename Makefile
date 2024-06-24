@@ -1,7 +1,7 @@
 # Makefile for avr-gcc
 MCU_TARGET ?= attiny13a
 PGR = main
-CCFLAGS = -Wall -Wextra -Os --short-enums -flto -MMD -MP
+CCFLAGS = -g3 -Wall -Wextra -Os --short-enums -flto -MMD -MP
 PGR_HW = usbasp #stk500v2 -D -P /dev/ttyUSB0
 MODULES = 
 # EFLAGS ?= 
